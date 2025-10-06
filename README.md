@@ -1,68 +1,140 @@
 # Craftista – DevOps Implementation of a Polyglot Microservices App
+## My contributions:
+Craftista is a **polyglot microservices application** that I containerized, and deployed on **Kubernetes**  
+A fully containerized, microservices-based application deployed on Kubernetes, featuring:
 
-Craftista is a **polyglot microservices application** that I containerized, orchestrated, and deployed using **Docker, Docker Compose, and GitHub Actions**.  
-It demonstrates my ability to work with **multiple languages, databases, containerization, and CI/CD pipelines**
-
----
-
-## 🔹 Architecture Overview
-
-- **Frontend**: Node.js + Express  
-- **Catalogue Service**: Python + Flask + MongoDB  
-- **Voting Service**: Java + Spring Boot + PostgreSQL  
-- **Recommendation Service**: Go  
-
-**Databases:**  
-- MongoDB (for Catalogue)  
-- PostgreSQL (for Voting)  
-
-**Orchestration:** Docker Compose  
-**Deployment:** AWS EC2 via GitHub Actions  
+1. Multi-service architecture (frontend, catalogue, recommendation, and voting)
+2. Databases (PostgreSQL and MongoDB)
+3. Centralized Ingress routing
+4. Persistent storage
+5. Prometheus + Grafana for monitoring and observability
 
 ---
 
-## 🛠️ My Contributions
+## 🔹 Architecture
 
-- **Containerization**  
-  - Wrote `Dockerfile`s for all microservices.  
-  - Used **multi-stage builds** to reduce image size & optimize build times.  
 
-- **Service Orchestration**  
-  - Wrote `docker-compose.prod.yml` to run all services + databases together.  
-  - Configured a custom bridge network for inter-service communication.  
+<img width="1536" height="1024" alt="craftista" src="https://github.com/user-attachments/assets/08974b98-08fc-40d0-88cf-9aa806ccc954" />
 
-- **Persistence**  
-  - Used Docker volumes for MongoDB & PostgreSQL to persist data.  
-
-- **CI/CD Pipeline**  
-  - Automated build & push of images to DockerHub using **GitHub Actions**.  
-  - Configured auto-deployment to AWS EC2 with `docker-compose`.  
 
 ---
 
-## 🚀 How to Run Locally
+## 🛠️ Tech Stack
 
-### 1. Clone this repository
+  | Category             | Technologies Used                           |
+| -------------------- | ------------------------------------------- |
+| **Orchestration**    | Kubernetes (Minikube)                       |
+| **Networking**       | Ingress Controller (NGINX)                  |
+| **Databases**        | PostgreSQL, MongoDB                         |
+| **Persistence**      | Persistent Volumes (local & standard)       |
+| **Monitoring**       | Prometheus, Grafana, Alertmanager (planned) |
+| **CI/CD (Optional)** | Helm & GitHub Actions                       |
+| **Languages**        | Node.js, Java (Spring Boot), React          |
+
+
+---
+
+
+
+## Ingress Routing Rules
+
+| Path                  | Service                | Port |
+| --------------------- | ---------------------- | ---- |
+| `/`                   | frontend-service       | 3000 |
+| `/api/catalogue`      | catalogue-service      | 5000 |
+| `/api/recommendation` | recommendation-service | 8080 |
+| `/api/voting`         | voting-service         | 8080 |
+
+---
+
+
+## Persistent Storage
+
+| Component  | PVC Name         | StorageClass  | Capacity |
+| ---------- | ---------------- | ------------- | -------- |
+| PostgreSQL | `postgres-pvc`   | standard      | 1Gi      |
+| MongoDB    | `mongo-pvc`      | standard      | 1Gi      |
+| Prometheus | `prometheus-pvc` | local-storage | 5Gi      |
+| Grafana    | `grafana-pvc`    | local-storage | 5Gi      |
+
+---
+
+
+## How to run locally:
+### 1. Start Minikube
+```
+minikube start --driver=docker
+```
+### 2. Enable ingress
+```
+minikube addons enable ingress
+```
+### 3. Apply all manifests
+```
+kubectl apply -f k8s/
+```
+### 4. Add this to your /etc/hosts
+```
+sudo vim /etc/hosts
+<your-minikube-ip>  craftista.local
+
+```
+### 5. Then run
+```
+minikube tunnel
+(run this on a separate terminal and leave it running)
+
+```
+### 6. Monitoring Setup
+### Prometheus
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prometheus prometheus-community/prometheus
+```
+### Access:
+```
+minikube service prometheus-server-ext
+```
+### Grafana
+```
+helm install grafana grafana/grafana
+```
+### Access:
+```
+minikube service grafana-ext
+```
+### Retrieve admin password:
+```
+kubectl get secret grafana -o jsonpath="{.data.admin-password}" | base64 --decode
+```
+### 7. Access the application
+```
+curl http://craftista.local
+curl http://craftista.local/voting
+curl http://craftista.local/catalogue
 ```
 
-git clone https://github.com/<your-username>/craftista.git
-cd craftista
-```
+---
 
-### 2. Build and start all services
-docker compose -f docker-compose.dev.yml up -d --build
+##  Future Enhancements
 
-### 3. Stop everything
-docker compose -f docker-compose.dev.yml down
+1. TLS configuration for Ingress
+2. AlertManager integration with Slack/email
+3. Horizontal Pod Autoscaler for dynamic scaling
+4. CI/CD pipeline via GitHub Actions
+5. Centralized logging (ELK Stack or Loki)
 
-```
-Frontend: http://localhost:3000
-Catalogue Service: http://localhost:5000
-Voting Service: http://localhost:8081
-Recommendation Service: http://localhost:8082
-```
+## Learning Outcomes
+
+1. Deep understanding of Kubernetes architecture
+2. Implemented multi-tier microservices on Minikube
+3. Deployed and exposed services using Ingress
+4. Managed persistent storage
+5. Configured Prometheus and Grafana for observability
+6. Gained hands-on troubleshooting experience with pods, PVCs, and Ingress
 
 
+   
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------

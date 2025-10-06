@@ -19,7 +19,7 @@ A fully containerized, microservices-based application deployed on Kubernetes, f
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
   | Category             | Technologies Used                           |
 | -------------------- | ------------------------------------------- |
